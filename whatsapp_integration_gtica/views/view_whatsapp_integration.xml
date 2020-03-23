@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_whatsapp_default_form" model="ir.ui.view">
+            <field name="name">whatsapp.default.form</field>
+            <field name="model">whatsapp.default</field>
+            <field name="arch" type="xml">
+                <form string="Whatsapp message default ">
+                    <sheet string="Invoice">
+                         <separator string="Whatsapp message template" class="oe_text_center"
+                                           style="background-color: #eee; padding: 5px;"/>
+                        <group>
+                            <group>
+                                <field name="name"  string="Title Template" class="oe_inline"/>
+                            </group>
+                            <group>
+                                <field name="category" widget="selection" string="Category" class="oe_inline" />
+                            </group>
+                        </group>
+                        <hr/>
+
+                        <label for="default_messege" string="Message Default"/>
+                        <field name="default_messege" />
+                        <hr/>
+                        <p>*Remember, you can place the shortcode {name} to get the partner or contact name automatically in your template message.</p>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_whatsapp_default_tree" model="ir.ui.view">
+            <field name="name">whatsapp.default.tree</field>
+            <field name="model">whatsapp.default</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name" string="Title"/>
+                    <field name="default_messege" string="Message template"/>
+                    <field name="category" string="Category"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_whatsapp_default" model="ir.actions.act_window">
+            <field name="name">Whatsapp message default</field>
+            <field name="res_model">whatsapp.default</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="whatsapp_integration_gtica_menu_root"
+            name="Whatsapp Integration"
+            web_icon="whatsapp_integration_gtica_gtica,static/description/icon.png"
+            action="action_whatsapp_default"
+            groups="sales_team.group_sale_manager"
+            sequence="9"
+         />
+
+        <menuitem id="whatsapp_default_config"
+            name="Default Whatsapp"
+            parent="whatsapp_integration_gtica_menu_root"
+            sequence="1"
+           />
+
+    </data>
+</odoo>

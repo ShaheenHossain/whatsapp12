@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<template id="template_quote">
+<t t-foreach="docs" t-as="doc">
+<t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)" />
+Info the *<span t-field="doc.company_id.name"/>*
+<br></br>
+<span>For *Client*: <t t-esc="doc.partner_id.name"/></span>
+<br></br><br></br>
+<span>*Hi Dear*</span>
+<br></br>
+<t t-if="not (env.context.get('proforma', False) or is_pro_forma)">
+<span t-if="doc.state not in ['draft','sent']">Next, details of your Order # </span>
+<span t-if="doc.state in ['draft','sent']">Next, details of your Quotation, # </span>
+</t>
+<t t-if="env.context.get('proforma', False) or is_pro_forma">
+<span>Next, details of your Pro-Forma Invoice # </span>
+</t>
+<span t-field="doc.name"/>
+<br></br>
+<t t-set="current_subtotal" t-value="0"/>
+<t t-foreach="doc.order_line" t-as="line">
+<t t-set="current_subtotal" t-value="current_subtotal + line.price_subtotal" groups="account.group_show_line_subtotals_tax_excluded"/>
+<t t-set="current_subtotal" t-value="current_subtotal + line.price_total" groups="account.group_show_line_subtotals_tax_included"/>
+<br></br>
+<span t-field="line.product_id"/>
+<br></br>
+*Qty:*<span t-field="line.product_uom_qty"/>
+<br></br>
+*Total Price:*<span t-field="line.price_total"/>
+<t t-if="display_discount" >
+<br></br>
+*Discount*<span t-field="line.discount"/>
+</t>
+<br/>
+-------------------------
+<t t-if="line.display_type == 'line_section'">
+<span t-field="line.name"/>
+<t t-set="current_section" t-value="line"/>
+<t t-set="current_subtotal" t-value="0"/>
+</t>
+</t>
+<br/>
+*Total*: <span t-field="doc.amount_total"/>
+<br/>
+<t t-if="doc.confirmation_date and doc.state not in ['draft','sent']">
+<br/>
+*Date Ordered:*
+<span t-esc="doc.confirmation_date.strftime('%m/%d/%Y')"/>
+</t>
+<t t-if="doc.date_order and doc.state in ['draft','sent']" ><br/>
+*Quotation Date:*
+<span t-esc="doc.date_order.strftime('%m/%d/%Y')"/>
+</t>
+<t t-if="doc.user_id.name" >
+<br/>
+*Salesperson:* &#xA;
+<span t-field="doc.user_id"/>
+</t>
+<br/>
+Please feel free to contact me through this channel if you have any questions. *Regards*
+<br/>
+*Note:* Remember that this message is informative, request your formal document
+<br/>
+<span t-field="doc.company_id.website"/>
+</t>
+</template>
+
+<template id="template_quote_link">
+<t t-foreach="docs" t-as="doc">
+<t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)" />
+Info the *<span t-field="doc.company_id.name"/>*
+<br></br>
+<span>For *Client*: <t t-esc="doc.partner_id.name"/></span>
+<br></br><br></br>
+<span>*Hi Dear*</span>
+<br></br>
+<t t-if="not (env.context.get('proforma', False) or is_pro_forma)">
+<span t-if="doc.state not in ['draft','sent']">In the following link, details of your Order # </span>
+<span t-if="doc.state in ['draft','sent']">In the following link, details of your Quotation, # </span>
+</t>
+<t t-if="env.context.get('proforma', False) or is_pro_forma">
+<span>Next, details of your Pro-Forma Invoice # </span>
+</t>
+<span t-field="doc.name"/>
+<br/>
+------------------
+<br></br>
+{link}
+<br></br>
+------------------
+<t t-if="doc.confirmation_date and doc.state not in ['draft','sent']">
+<br/>
+*Date Ordered:*
+<span t-esc="doc.confirmation_date.strftime('%m/%d/%Y')"/>
+</t>
+<t t-if="doc.date_order and doc.state in ['draft','sent']" >
+ <br/>
+*Quotation Date:*
+<span t-esc="doc.date_order.strftime('%m/%d/%Y')"/>
+</t>
+<t t-if="doc.user_id.name" >
+<br/>
+*Salesperson:* &#xA;
+<span t-field="doc.user_id"/>
+</t>
+<br/>
+Please feel free to contact me through this channel if you have any questions. *Regards*
+<br/>
+*Note:* Remember that this message is informative, request your formal document
+<br/>
+<span t-field="doc.company_id.website"/>
+</t>
+</template>
+
+<template id="template_invoice">
+<t t-foreach="docs" t-as="o">
+<t t-set="lang" t-value="o.user_id.lang if o.type in ('in_invoice', 'in_refund') else o.partner_id.lang"/>
+<t t-set="o" t-value="o.with_context(lang=lang)" />
+Info the *<span t-field="o.company_id.name"/>*
+<br></br>
+<span>For *Client*: <t t-esc="o.partner_id.name"/></span>
+<br></br><br></br>
+<span>*Hi Dear*</span>
+<br></br>
+<span t-if="o.type == 'out_invoice' and o.state in ('open', 'in_payment', 'paid')">Next, details of your Invoice #</span>
+<span t-if="o.type == 'out_invoice' and o.state == 'draft'">Next, details of your Draft Invoice #</span>
+<span t-if="o.type == 'out_invoice' and o.state == 'cancel'">Next, details of your Cancelled Invoice #</span>
+<span t-if="o.type == 'out_refund'">Next, details of your Credit Note #</span>
+<span t-if="o.type == 'in_refund'">Next, details of your Vendor Credit Note #</span>
+<span t-if="o.type == 'in_invoice'">Next, details of your Vendor Bill #</span>
+<span t-field="o.number"/>
+<br></br><br></br>
+<t t-set="display_discount" t-value="any([l.discount for l in o.invoice_line_ids])"/>
+<t t-set="current_subtotal" t-value="0"/>
+
+<t t-foreach="o.invoice_line_ids" t-as="line">
+
+<t t-set="current_subtotal" t-value="current_subtotal + line.price_subtotal" groups="account.group_show_line_subtotals_tax_excluded"/>
+<t t-set="current_subtotal" t-value="current_subtotal + line.price_total" groups="account.group_show_line_subtotals_tax_included"/>
+
+<t t-if="not line.display_type" name="account_invoice_line_accountable">
+*<span name="account_invoice_line_name"><span t-esc="line.name"/></span>
+<span t-esc="line.origin"/>*
+<br/>
+*Qty:*
+<span t-esc="line.quantity"/>
+<span t-esc="line.uom_id"  groups="uom.group_uom"/>
+<br/>
+*Price Unit:*
+<span t-esc="line.price_unit"/>
+<br/>
+<span t-if="display_discount" >
+*Discount:*
+<span t-esc="line.discount"/>
+<br/>
+</span>
+*Tax*
+<span t-esc="', '.join(map(lambda x: (x.description or x.name), line.invoice_line_tax_ids))"/>
+<br/>
+*Amount*
+<span t-esc="line.price_subtotal" groups="account.group_show_line_subtotals_tax_excluded"/>
+<span t-esc="line.price_total" groups="account.group_show_line_subtotals_tax_included"/>
+<br/>
+</t>
+<t t-if="line.display_type == 'line_section'">
+<span t-field="line.name"/>
+<t t-set="current_section" t-value="line"/>
+<t t-set="current_subtotal" t-value="0"/>
+</t>
+<t t-if="line.display_type == 'line_note'">
+<span t-field="line.name"/>
+</t>
+<t t-if="current_section and (line_last or o.invoice_line_ids[line_index+1].display_type == 'line_section')">
+<strong class="mr16">Subtotal</strong>
+<span
+t-esc="current_subtotal"
+t-options='{"widget": "monetary", "display_currency": o.currency_id}'
+/>
+</t>
+</t>
+-----------------
+<br></br>
+*Subtotal:* <span t-esc="o.amount_untaxed"/>
+<br/>
+*Tax:*
+<t t-foreach="o.amount_by_group" t-as="amount_by_group">
+<t t-if="len(o.tax_line_ids) == 1 and o.amount_untaxed == amount_by_group[2]">
+<span t-esc="amount_by_group[0]"/>
+<span t-esc="amount_by_group[3]" />
+</t>
+<t t-else="">
+<span t-esc="amount_by_group[0]"/>
+<span>&amp;nbsp;<span>on</span>
+<t t-esc="amount_by_group[4]"/>
+</span>
+<span t-esc="amount_by_group[3]"/>
+</t>
+</t>
+<br/>
+*Total:* <span t-esc="o.amount_total"/>
+<br/>
+-----------------
+<br/><br/>
+*Invoice Date:*<span  t-esc="o.date_invoice.strftime('%m/%d/%Y')"/>
+<br></br>
+*Due Date:*
+<span class="m-0" t-esc="o.date_due.strftime('%m/%d/%Y')"/>
+<br/>
+
+<span t-if="o.reference">
+Please use the following communication for your payment : <b><span t-field="o.reference"/></b>
+<br/>
+</span>
+
+<span t-if="o.comment" name="comment">
+<span t-field="o.comment"/>
+<br/>
+</span>
+<span t-if="o.payment_term_id" name="payment_term">
+<span t-field="o.payment_term_id.note"/>
+<br/>
+</span>
+<span t-if="o.fiscal_position_id.note" name="note">
+<span t-field="o.fiscal_position_id.note"/>
+<br/>
+</span>
+<br/>
+*Note:* Remember that this message is informative, request your formal invoice
+<br/>
+<span t-field="o.company_id.website"/>
+</t>
+</template>
+
+<template id="template_invoice_link">
+<t t-foreach="docs" t-as="o">
+<t t-set="lang" t-value="o.user_id.lang if o.type in ('in_invoice', 'in_refund') else o.partner_id.lang"/>
+<t t-set="o" t-value="o.with_context(lang=lang)" />
+Info the *<span t-field="o.company_id.name"/>*
+<br></br>
+<span>For *Client*: <t t-esc="o.partner_id.name"/></span>
+<br></br><br></br>
+<span>*Hi Dear*</span>
+<br></br>
+<span t-if="o.type == 'out_invoice' and o.state in ('open', 'in_payment', 'paid')">Next, details of your Invoice #</span>
+<span t-if="o.type == 'out_invoice' and o.state == 'draft'">Next, details of your Draft Invoice #</span>
+<span t-if="o.type == 'out_invoice' and o.state == 'cancel'">Next, details of your Cancelled Invoice #</span>
+<span t-if="o.type == 'out_refund'">Next, details of your Credit Note #</span>
+<span t-if="o.type == 'in_refund'">Next, details of your Vendor Credit Note #</span>
+<span t-if="o.type == 'in_invoice'">Next, details of your Vendor Bill #</span>
+<span t-field="o.number"/>
+<br></br>
+------------------
+<br></br>
+{link}
+<br></br>
+------------------
+<br></br><br></br>
+<span t-if="o.reference">
+Please use the following communication for your payment : <b><span t-field="o.reference"/></b>
+<br/>
+
+</span>
+
+<span t-if="o.comment" name="comment">
+<span t-field="o.comment"/>
+<br/>
+</span>
+<span t-if="o.payment_term_id" name="payment_term">
+<span t-field="o.payment_term_id.note"/>
+<br/>
+</span>
+<span t-if="o.fiscal_position_id.note" name="note">
+<span t-field="o.fiscal_position_id.note"/>
+<br/>
+</span>
+<br/>
+*Note:* Remember that this message is informative, request your formal invoice
+<br/>
+<span t-field="o.company_id.website"/>
+</t>
+</template>
+
+<template id="template_stock_picking">
+<t t-foreach="docs" t-as="o">
+<t t-set="o" t-value="o.with_context(lang=o.partner_id.lang)" />
+Info the *<span t-esc="o.picking_type_id.warehouse_id.partner_id.name"/>*
+<br></br>
+<span>For *Client*: <t t-esc="o.partner_id.name"/></span>
+<br></br><br></br>
+<span>*Hi Dear*</span>
+<br></br>
+<span>In the following message, details of your Delivery products #</span>
+<span t-field="o.name"/>
+<br/><br/>
+<t t-set="lines" t-value="o.move_lines.filtered(lambda x: x.product_uom_qty)"/>
+*Products:*
+<br></br>-------------------<br></br>
+<t t-if="o.move_line_ids and o.state!='done'">
+<t t-foreach="lines" t-as="move">
+*<span t-field="move.product_id"/>*
+<t t-if="o.picking_type_code == 'outgoing'">
+    <span t-field="move.product_id.sudo().description_pickingout"/>
+</t>
+<br/>
+*Qty:*
+<span t-field="move.product_uom_qty"/>
+<span t-field="move.product_uom"/>
+<br/>
+</t>
+</t>
+<t t-if="o.move_line_ids and o.state=='done'">
+<t t-foreach="lines" t-as="move">
+<span t-field="move.product_id"/>
+<t t-if="o.picking_type_code == 'outgoing'">
+    <span t-field="move.product_id.sudo().description_pickingout"/>
+</t>
+<br/>
+*Qty:*
+<span t-field="move.product_uom_qty"/>
+<span t-field="move.product_uom"/>
+<br/>
+</t>
+</t>
+-------------------<br></br>
+<span>*Date Delivery:*</span>
+<span t-esc="o.scheduled_date.strftime('%m/%d/%Y')"/>
+<br></br>
+<span>*Customer Address:*</span>
+<span t-esc="o.partner_id "
+t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True}'/>
+*Delivery Note:*
+<br/>
+<t t-esc="o.note"/>
+<br/>
+Please feel free to contact me through this channel if you have any questions.*Regards*
+<br/>
+*Note:* Remember that this message is informative, request your formal document
+<br/>
+<span t-field="o.company_id.website"/>
+</t>
+</template>
+
+</odoo>

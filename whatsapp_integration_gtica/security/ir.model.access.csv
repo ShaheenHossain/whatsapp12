@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_whatsapp_integration_quoting_manger,whatsapp.integration.sale.order.team,model_whatsapp_default,sales_team.group_sale_manager,1,1,1,1
+access_whatsapp_integration_sale_order_manager,whatsapp.integration.sale.order.team.send,model_whatsapp_default,sales_team.group_sale_manager,1,1,1,1
+access_whatsapp_integration_quoting_team,whatsapp.integration.sale.order.team,model_whatsapp_default,sales_team.group_sale_salesman,1,1,0,0
+access_whatsapp_integration_sale_order_team,whatsapp.integration.sale.order.team.send,model_whatsapp_default,sales_team.group_sale_salesman,1,1,0,0

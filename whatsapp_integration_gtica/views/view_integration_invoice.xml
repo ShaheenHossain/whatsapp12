@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="invoice_form_extend" model="ir.ui.view">
+        <field name="name">account.invoice.form.extend</field>
+        <field name="model">account.invoice</field>
+        <field name="inherit_id" ref="account.invoice_form"/>
+        <field name="arch" type="xml">
+           <xpath expr="//header/button[@name='preview_invoice']" position="after">
+                <button name="send_whatsapp_step_one" string="Send Whatsapp" type="object"/>
+           </xpath>
+        </field>
+    </record>
+</odoo>
